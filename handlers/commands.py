@@ -20,3 +20,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/time 10 - Set delete timer\n"
         "/clean - Clean messages"
     )
+async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "🤖 Clear7_bot Status\n\n"
+        "🟢 Bot: Online\n"
+        "🗑️ Auto Delete: Enabled\n"
+        "⏱️ Timer: 10 minutes"
+    )
