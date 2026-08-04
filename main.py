@@ -8,7 +8,7 @@ from config import BOT_TOKEN
 from database import init_db
 
 from handlers.commands import start, help_command, status
-
+from handlers.messages import handle_message
 
 def main():
     init_db()
@@ -18,6 +18,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("status", status))
+    app.add_handler(MessageHandler(filters.ALL, handle_message))
 
     print("✅ Clear7_bot Started Successfully")
 
@@ -26,8 +27,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-from telegram.ext import MessageHandler, filters
-from handlers.messages import handle_message
-app.add_handler(
-    MessageHandler(filters.ALL, handle_message)
-)
