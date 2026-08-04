@@ -1,0 +1,7 @@
+import os
+
+BOT_TOKEN = os.getenv("8388143602:AAEGGXKMkJQF4BG-9MHznm3jOVAT1I7_FRA")
+
+DEFAULT_DELETE_TIME = 10
+
+BOT_NAME = "Clear7_bot"
