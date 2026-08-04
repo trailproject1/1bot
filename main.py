@@ -1,4 +1,9 @@
-from telegram.ext import Application, CommandHandler
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    filters
+)
 from config import BOT_TOKEN
 from database import init_db
 
