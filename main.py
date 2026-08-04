@@ -10,7 +10,7 @@ def main():
 
     app = Application.builder().token(BOT_TOKEN).build()
 
-    app.add_handler(CommandHandler("start", start))
+    from handlers.commands import start, help_command
     app.add_handler(CommandHandler("help", help_command))
 
     print("✅ Clear7_bot Started Successfully")
