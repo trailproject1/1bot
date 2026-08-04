@@ -1,23 +1,8 @@
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.ext import Application, CommandHandler
 from config import BOT_TOKEN
 from database import init_db
 
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "✅ Clear7_bot is Online!"
-    )
-
-
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "/auto on\n"
-        "/auto off\n"
-        "/time <minutes>\n"
-        "/status\n"
-        "/clean"
-    )
+from handlers.commands import start, help_command
 
 
 def main():
@@ -28,8 +13,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
 
-    print("✅ Database Loaded")
-    print("✅ Clear7_bot Started")
+    print("✅ Clear7_bot Started Successfully")
 
     app.run_polling()
 
