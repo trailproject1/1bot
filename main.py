@@ -103,10 +103,14 @@ def main():
     # Admin Purge Command (/purge)
     app.add_handler(CommandHandler("purge", purge_command))
 
-    # Auto Clean Handler (Listens to ALL messages except commands)
+    # Admin Purge Command (/purge)
+    app.add_handler(CommandHandler("purge", purge_command))
+
+    # Auto Clean Handler (ALL messages including Bot replies and service updates)
+    # Note: ~filters.COMMAND-a remove pannirukom, and filters.ALL paka-va work aagum!
     app.add_handler(
         MessageHandler(
-            filters.ALL & ~filters.COMMAND, 
+            filters.ALL, 
             auto_clean_handler
         )
     )
