@@ -16,7 +16,7 @@ app_web = Flask('')
 
 @app_web.route('/')
 def home():
-    return "Bot is alive!"
+    return "Bot is alive and running!"
 
 def run_web():
     port = int(os.environ.get("PORT", 8080))
@@ -31,6 +31,7 @@ def keep_alive():
 DELETE_DELAY = 600
 
 async def delete_message_after_delay(context: ContextTypes.DEFAULT_TYPE):
+    """Job callback to delete a message after timer expires."""
     job_data = context.job.data
     chat_id = job_data["chat_id"]
     message_id = job_data["message_id"]
@@ -41,12 +42,14 @@ async def delete_message_after_delay(context: ContextTypes.DEFAULT_TYPE):
         print(f"Failed to delete message {message_id} in {chat_id}: {e}")
 
 async def auto_clean_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Monitors messages and schedules them for deletion after 10 minutes."""
     if not update.effective_message or not update.effective_chat:
         return
         
     chat_id = update.effective_chat.id
     message_id = update.effective_message.message_id
 
+    # Schedule deletion task using JobQueue
     context.job_queue.run_once(
         delete_message_after_delay,
         when=DELETE_DELAY,
@@ -54,9 +57,11 @@ async def auto_clean_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     )
 
 async def purge_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Manual Purge: Deletes up to 100 recent messages instantly (Admin only)."""
     chat_id = update.effective_chat.id
     user_id = update.effective_user.id
 
+    # Check if user is an admin
     member = await context.bot.get_chat_member(chat_id, user_id)
     if member.status not in ["administrator", "creator"]:
         await update.message.reply_text("⚠️ Only admins can use /purge.")
@@ -65,6 +70,7 @@ async def purge_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     current_msg_id = update.message.message_id
     deleted_count = 0
 
+    # Loop through previous message IDs to bulk delete
     for msg_id in range(current_msg_id, max(1, current_msg_id - 100), -1):
         try:
             await context.bot.delete_message(chat_id=chat_id, message_id=msg_id)
@@ -77,6 +83,7 @@ async def purge_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text=f"🧹 Purged {deleted_count} messages."
     )
     
+    # Auto-delete the confirmation message after 5 seconds
     await asyncio.sleep(5)
     try:
         await status_msg.delete()
@@ -88,15 +95,18 @@ def main():
     if not BOT_TOKEN:
         raise ValueError("BOT_TOKEN environment variable not set!")
 
-    # Start dummy web server
+    # Start dummy web server for Render keep-alive
     keep_alive()
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
+    # Admin Purge Command (/purge)
     app.add_handler(CommandHandler("purge", purge_command))
+
+    # Auto Clean Handler (Listens to ALL messages except commands)
     app.add_handler(
         MessageHandler(
-            filters.CHAT & ~filters.COMMAND, 
+            filters.ALL & ~filters.COMMAND, 
             auto_clean_handler
         )
     )
